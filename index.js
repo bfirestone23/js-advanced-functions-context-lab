@@ -20,3 +20,75 @@ let allWagesFor = function () {
 
     return payable
 }
+
+const createEmployeeRecord = function(array){
+    return {
+        firstName: array[0],
+        familyName: array[1],
+        title: array[2],
+        payPerHour: array[3],
+        timeInEvents: [],
+        timeOutEvents: []
+    }
+}
+
+const createEmployeeRecords = function(array){
+    return array.map(a => createEmployeeRecord(a))
+}
+
+const createTimeInEvent = function(datetime){
+    let [date, hour] = datetime.split(" ")
+
+    this.timeInEvents.push({
+        type: "TimeIn",
+        hour: parseInt(hour, 10),
+        date
+    })
+
+    return this
+}
+
+const createTimeOutEvent = function(datetime){
+    let [date, hour] = datetime.split(" ")
+
+    this.timeOutEvents.push({
+        type: "TimeOut",
+        hour: parseInt(hour, 10),
+        date
+    })
+
+    return this
+}
+
+const hoursWorkedOnDate = function(date){
+    let timeIn = this.timeInEvents.find(e => e.date === date).hour
+    let timeOut = this.timeOutEvents.find(e => e.date === date).hour
+    let hrs = (timeOut - timeIn) / 100
+    return hrs
+}
+
+const wagesEarnedOnDate = function(date){
+    let wage = (this.payPerHour * hoursWorkedOnDate.call(this, date))
+    return parseFloat(wage.toString())
+}
+
+const allWages = function(){
+    let dates = this.timeInEvents.map(function(e){
+        return e.date
+    })
+    let wages = dates.reduce(function(sum, date){
+        return sum + wagesEarnedOnDate.call(this, date)
+    }.bind(this), 0)
+
+    return wages
+}
+
+const calculatePayroll = function(records){
+    return records.reduce(function(sum, record){
+        return sum + allWages.call(record);
+    }, 0)
+}
+
+const findEmployeeByFirstName = function(src, firstname){
+    return src.find(r => r.firstName === firstname);
+}
